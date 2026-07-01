@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan - Laundry Mas Bro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f4f8; }
+        .container { display: flex; }
+        
+        .sidebar { width: 260px; background: linear-gradient(180deg, #1976d2 0%, #1565c0 100%); min-height: 100vh; padding: 20px 0; position: fixed; left: 0; top: 0; }
+        .logo { text-align: center; padding: 0 20px 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo h2 { color: white; font-size: 24px; font-weight: 700; }
+        .logo span { color: #81d4fa; }
+        .menu { margin-top: 30px; }
+        .menu-item { padding: 15px 25px; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; border-left: 4px solid #81d4fa; }
+        .menu-item i { font-size: 20px; width: 25px; }
+        
+        .main-content { margin-left: 260px; flex: 1; padding: 30px; }
+        .page-header { background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .page-header h1 { font-size: 28px; color: #212121; margin-bottom: 5px; }
+        .page-header p { color: #757575; font-size: 14px; }
+        
+        .filter-section { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .filter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; font-size: 14px; color: #424242; }
+        .form-group input, .form-group select { padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.3s; }
+        .btn-primary { background: #1976d2; color: white; }
+        .btn-primary:hover { background: #1565c0; }
+        .btn-success { background: #388e3c; color: white; }
+        .btn-success:hover { background: #2e7d32; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 4px solid #1976d2; }
+        .stat-card.blue { border-left-color: #1976d2; }
+        .stat-card.green { border-left-color: #388e3c; }
+        .stat-card.orange { border-left-color: #f57c00; }
+        .stat-card.purple { border-left-color: #7b1fa2; }
+        .stat-card h3 { font-size: 13px; color: #757575; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .number { font-size: 32px; font-weight: 700; color: #212121; }
+        .stat-card .label { font-size: 12px; color: #9e9e9e; margin-top: 5px; }
+        
+        .report-section { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .section-header { padding: 20px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { font-size: 20px; color: #212121; }
+        .section-body { padding: 25px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f5f5f5; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+        th { font-weight: 600; color: #424242; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        td { color: #616161; }
+        tr:hover { background: #fafafa; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        
+        .chart-container { height: 300px; margin: 20px 0; }
+        .bar-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 250px; padding: 20px 0; border-bottom: 2px solid #e0e0e0; }
+        .bar-item { display: flex; flex-direction: column; align-items: center; flex: 1; margin: 0 5px; }
+        .bar { width: 40px; background: linear-gradient(180deg, #1976d2 0%, #1565c0 100%); border-radius: 5px 5px 0 0; transition: all 0.3s; position: relative; }
+        .bar:hover { background: linear-gradient(180deg, #2196f3 0%, #1976d2 100%); transform: scaleX(1.1); }
+        .bar-value { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: #1976d2; }
+        .bar-label { margin-top: 10px; font-size: 11px; color: #757575; text-align: center; }
+        
+        .summary-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e0e0; }
+        .summary-row:last-child { border-bottom: none; font-size: 16px; font-weight: 700; color: #1976d2; }
+        .summary-label { color: #616161; }
+        .summary-value { font-weight: 600; color: #212121; }
+        
+        .status-badge { padding: 4px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; }
+        .status-pickup { background: #ffe0b2; color: #e65100; }
+        .status-washing { background: #bbdefb; color: #1565c0; }
+        .status-delivered { background: #c8e6c9; color: #2e7d32; }
+        
+        /* Print Area */
+        #printReportArea { display: none; }
+        
+        @media print {
+            body * { display: none !important; }
+            #printReportArea, #printReportArea * { display: block !important; }
+            #printReportArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 30px;
+                background: white;
+            }
+            @page { size: A4; margin: 15mm; }
+            .print-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 20px; margin-bottom: 30px; }
+            .print-header h1 { font-size: 28px; margin-bottom: 10px; }
+            .print-header p { font-size: 13px; color: #555; margin: 3px 0; }
+            .print-info { margin-bottom: 25px; font-size: 13px; }
+            .print-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 25px 0; }
+            .print-stat-box { border: 1px solid #000; padding: 15px; text-align: center; }
+            .print-stat-box h3 { font-size: 12px; margin-bottom: 8px; }
+            .print-stat-box .num { font-size: 24px; font-weight: bold; }
+            .print-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            .print-table th, .print-table td { border: 1px solid #000; padding: 10px; font-size: 12px; }
+            .print-table th { background: #f0f0f0; }
+            .print-summary { margin-top: 25px; padding: 20px; border: 1px solid #000; }
+            .print-footer { margin-top: 30px; text-align: center; font-size: 11px; color: #666; border-top: 1px dashed #000; padding-top: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo"><h2>Laundry <span>Mas Bro</span></h2></div>
+            <div class="menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+                <a href="add-transaction.html" class="menu-item"><i class="fas fa-plus-circle"></i><span>Add Transaction</span></a>
+                <a href="transaction-history.html" class="menu-item"><i class="fas fa-history"></i><span>Transaction History</span></a>
+                <a href="customers.html" class="menu-item"><i class="fas fa-users"></i><span>Customers</span></a>
+                <a href="drivers.html" class="menu-item"><i class="fas fa-motorcycle"></i><span>Drivers</span></a>
+                <a href="reports.html" class="menu-item active"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="promos.html" class="menu-item"><i class="fas fa-tag"></i><span>Promos</span></a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1><i class="fas fa-chart-bar"></i> Laporan Transaksi</h1>
+                <p>Laporan keuangan dan statistik transaksi Laundry Mas Bro</p>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Tanggal Mulai</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Tanggal Akhir</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-filter"></i> Status</label>
+                        <select id="filterStatus">
+                            <option value="">Semua Status</option>
+                            <option value="Dijemput">Dijemput</option>
+                            <option value="Dicuci">Dicuci</option>
+                            <option value="Selesai">Selesai</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="generateReport()"><i class="fas fa-sync"></i> Generate Laporan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <h3><i class="fas fa-shopping-cart"></i> Total Transaksi</h3>
+                    <div class="number" id="totalTransaksi">0</div>
+                    <div class="label">Transaksi</div>
+                </div>
+                <div class="stat-card green">
+                    <h3><i class="fas fa-money-bill-wave"></i> Total Pendapatan</h3>
+                    <div class="number" id="totalPendapatan">Rp 0</div>
+                    <div class="label">Revenue</div>
+                </div>
+                <div class="stat-card orange">
+                    <h3><i class="fas fa-weight-hanging"></i> Total Berat</h3>
+                    <div class="number" id="totalBerat">0</div>
+                    <div class="label">Kilogram</div>
+                </div>
+                <div class="stat-card purple">
+                    <h3><i class="fas fa-users"></i> Total Pelanggan</h3>
+                    <div class="number" id="totalPelanggan">0</div>
+                    <div class="label">Pelanggan Unik</div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="report-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Grafik Pendapatan Mingguan</h2>
+                </div>
+                <div class="section-body">
+                    <div class="chart-container">
+                        <div class="bar-chart" id="weeklyChart">
+                            <!-- Bars will be generated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Details Table -->
+            <div class="report-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Detail Transaksi</h2>
+                    <button class="btn btn-success" onclick="cetakLaporan()"><i class="fas fa-print"></i> Cetak Laporan</button>
+                </div>
+                <div class="section-body">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>ID Transaksi</th>
+                                <th>Pelanggan</th>
+                                <th>Layanan</th>
+                                <th>Berat</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span class="summary-label">Total Transaksi:</span>
+                            <span class="summary-value" id="summaryTotalTransaksi">0 transaksi</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Total Pendapatan:</span>
+                            <span class="summary-value" id="summaryTotalPendapatan">Rp 0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Rata-rata per Transaksi:</span>
+                            <span class="summary-value" id="summaryRataRata">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Area -->
+    <div id="printReportArea"></div>
+
+    <script>
+        // Set default date range (last 7 days)
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').valueAsDate = today;
+            document.getElementById('startDate').valueAsDate = lastWeek;
+            
+            generateReport();
+        });
+
+        function generateReport() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            const filterStatus = document.getElementById('filterStatus').value;
+            
+            let transactions = JSON.parse(localStorage.getItem('laundryMasBroData')) || [];
+            
+            // Filter transactions by date and status
+            const filteredTransactions = transactions.filter(trx => {
+                const trxDate = new Date(trx.date.split(' ').reverse().join('-'));
+                const dateMatch = trxDate >= startDate && trxDate <= endDate;
+                const statusMatch = !filterStatus || trx.status === filterStatus;
+                return dateMatch && statusMatch;
+            });
+            
+            // Calculate statistics
+            const totalTransaksi = filteredTransactions.length;
+            const totalPendapatan = filteredTransactions.reduce((sum, trx) => {
+                return sum + (parseInt(trx.total.replace(/[^0-9]/g, '')) || 0);
+            }, 0);
+            const totalBerat = filteredTransactions.reduce((sum, trx) => {
+                return sum + (parseFloat(trx.weight) || 0);
+            }, 0);
+            const uniqueCustomers = [...new Set(filteredTransactions.map(trx => trx.customer))];
+            
+            // Update statistics cards
+            document.getElementById('totalTransaksi').textContent = totalTransaksi;
+            document.getElementById('totalPendapatan').textContent = 'Rp ' + totalPendapatan.toLocaleString('id-ID');
+            document.getElementById('totalBerat').textContent = totalBerat.toFixed(1);
+            document.getElementById('totalPelanggan').textContent = uniqueCustomers.length;
+            
+            // Update summary box
+            document.getElementById('summaryTotalTransaksi').textContent = totalTransaksi + ' transaksi';
+            document.getElementById('summaryTotalPendapatan').textContent = 'Rp ' + totalPendapatan.toLocaleString('id-ID');
+            const rataRata = totalTransaksi > 0 ? totalPendapatan / totalTransaksi : 0;
+            document.getElementById('summaryRataRata').textContent = 'Rp ' + Math.round(rataRata).toLocaleString('id-ID');
+            
+            // Generate weekly chart
+            generateWeeklyChart(filteredTransactions);
+            
+            // Populate table
+            populateReportTable(filteredTransactions);
+        }
+
+        function generateWeeklyChart(transactions) {
+            const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+            const dailyRevenue = [0, 0, 0, 0, 0, 0, 0];
+            
+            transactions.forEach(trx => {
+                const date = new Date(trx.date.split(' ').reverse().join('-'));
+                const dayIndex = date.getDay();
+                const amount = parseInt(trx.total.replace(/[^0-9]/g, '')) || 0;
+                dailyRevenue[dayIndex] += amount;
+            });
+            
+            const maxRevenue = Math.max(...dailyRevenue, 1);
+            const chartContainer = document.getElementById('weeklyChart');
+            chartContainer.innerHTML = '';
+            
+            dailyRevenue.forEach((revenue, index) => {
+                const height = (revenue / maxRevenue) * 200;
+                const barItem = document.createElement('div');
+                barItem.className = 'bar-item';
+                barItem.innerHTML = `
+                    <div class="bar" style="height: ${height}px;">
+                        <span class="bar-value">Rp ${(revenue/1000).toFixed(0)}k</span>
+                    </div>
+                    <div class="bar-label">${days[index]}</div>
+                `;
+                chartContainer.appendChild(barItem);
+            });
+        }
+
+        function populateReportTable(transactions) {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: #757575;">Tidak ada data transaksi untuk periode yang dipilih</td></tr>';
+                return;
+            }
+            
+            transactions.forEach((trx, index) => {
+                const tr = document.createElement('tr');
+                const statusClass = trx.status === 'Selesai' ? 'status-delivered' : 
+                                   trx.status === 'Dicuci' ? 'status-washing' : 'status-pickup';
+                
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${trx.date}</td>
+                    <td><strong>${trx.id}</strong></td>
+                    <td>${trx.customer}</td>
+                    <td>${trx.service || 'Layanan Laundry'}</td>
+                    <td>${trx.weight}</td>
+                    <td class="text-right"><strong>Rp ${parseInt(trx.total.replace(/[^0-9]/g, '')).toLocaleString('id-ID')}</strong></td>
+                    <td class="text-center"><span class="status-badge ${statusClass}">${trx.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function cetakLaporan() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const totalTransaksi = document.getElementById('totalTransaksi').textContent;
+            const totalPendapatan = document.getElementById('totalPendapatan').textContent;
+            const totalBerat = document.getElementById('totalBerat').textContent;
+            const totalPelanggan = document.getElementById('totalPelanggan').textContent;
+            
+            let transactions = JSON.parse(localStorage.getItem('laundryMasBroData')) || [];
+            const filteredTransactions = transactions.filter(trx => {
+                const trxDate = new Date(trx.date.split(' ').reverse().join('-'));
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                return trxDate >= start && trxDate <= end;
+            });
+            
+            let tableRows = '';
+            filteredTransactions.forEach((trx, index) => {
+                tableRows += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${trx.date}</td>
+                        <td>${trx.id}</td>
+                        <td>${trx.customer}</td>
+                        <td>${trx.service || 'Layanan Laundry'}</td>
+                        <td>${trx.weight}</td>
+                        <td class="text-right">Rp ${parseInt(trx.total.replace(/[^0-9]/g, '')).toLocaleString('id-ID')}</td>
+                        <td>${trx.status}</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('printReportArea').innerHTML = `
+                <div class="print-header">
+                    <h1>LAUNDRY MAS BRO</h1>
+                    <p>Jl. Contoh No. 123, Kota Semarang</p>
+                    <p>Telp: 0812-3456-7890</p>
+                    <p style="margin-top: 15px; font-size: 18px; font-weight: bold;">LAPORAN TRANSAKSI</p>
+                    <p>Periode: ${new Date(startDate).toLocaleDateString('id-ID')} - ${new Date(endDate).toLocaleDateString('id-ID')}</p>
+                </div>
+                
+                <div class="print-info">
+                    <p>Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
+                </div>
+                
+                <div class="print-stats">
+                    <div class="print-stat-box">
+                        <h3>Total Transaksi</h3>
+                        <div class="num">${totalTransaksi}</div>
+                    </div>
+                    <div class="print-stat-box">
+                        <h3>Total Pendapatan</h3>
+                        <div class="num">${totalPendapatan}</div>
+                    </div>
+                    <div class="print-stat-box">
+                        <h3>Total Berat</h3>
+                        <div class="num">${totalBerat} kg</div>
+                    </div>
+                    <div class="print-stat-box">
+                        <h3>Total Pelanggan</h3>
+                        <div class="num">${totalPelanggan}</div>
+                    </div>
+                </div>
+                
+                <table class="print-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>ID Transaksi</th>
+                            <th>Pelanggan</th>
+                            <th>Layanan</th>
+                            <th>Berat</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+                
+                <div class="print-summary">
+                    <h3>Ringkasan</h3>
+                    <p>Total Transaksi: ${totalTransaksi}</p>
+                    <p>Total Pendapatan: ${totalPendapatan}</p>
+                    <p>Total Berat Cucian: ${totalBerat} kg</p>
+                </div>
+                
+                <div class="print-footer">
+                    <p>Laporan ini dibuat secara otomatis oleh Sistem Informasi Laundry Mas Bro</p>
+                    <p>Terima kasih</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+    </script>
+</body>
+</html>
